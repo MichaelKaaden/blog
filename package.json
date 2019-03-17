@@ -1,0 +1,25 @@
+{
+  "name": "docker",
+  "version": "1.0.0",
+  "description": "Some blog posts",
+  "main": "index.js",
+  "scripts": {
+    "prettify": "prettier --print-width 80 --write '**/*.md'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MichaelKaaden/blog.git"
+  },
+  "keywords": [
+    "writings"
+  ],
+  "author": "Michael Kaaden <github@kaaden.net>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/MichaelKaaden/blog/issues"
+  },
+  "homepage": "https://github.com/MichaelKaaden/blog#readme",
+  "devDependencies": {
+    "prettier": "^1.16.4"
+  }
+}
