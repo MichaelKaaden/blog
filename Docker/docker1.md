@@ -43,7 +43,7 @@ erstellen.
 
 ```dockerfile
 FROM nginx
-LABEL maintainer="Michael Kaaden <github@kaaden.net>"
+LABEL maintainer="Ihr Name <you@your.domain>"
 COPY nginx/default.conf /etc/nginx/conf.d
 COPY dist/dockerized-app /usr/share/nginx/html
 ```
@@ -54,8 +54,9 @@ Falls Sie diese Anleitung mit Ihrer eigenen App nachvollziehen, setzen Sie für
 Damit könnten wir das Docker-Image nun bereits bauen.
 
 Um den nötigen Zeitaufwand zum Bau zu verringern, sollten Sie eine
-`.dockerignore`-Datei folgenden Inhalts erstellen, um zu verhindern, dass
-unnötige Dateien und Verzeichnisse an den Docker-Daemon übertragen werden:
+`.dockerignore`-Datei folgenden Inhalts erstellen, um zu verhindern, dass dabei
+jedes Mal unnötige Dateien und Verzeichnisse an den Docker-Daemon übertragen
+werden:
 
 ```
 .dockerignore
@@ -146,9 +147,9 @@ dockerized-app  latest  419869cfab04   10 seconds ago  110MB
 
 Um nun einen Container auf Basis des eben erzeugten Image zu starten (zur
 Erinnerung: Container zu Image verhält sich wie Instanz zu Klasse), verwenden
-Sie `docker run -p 8093:80 -d --name web dockerized-app`. Das stellt den
-Container auf Ihrem Rechner unter dem Port 8093 bereit. Ihr Browser sollte Ihre
-App also unter `http://localhost:8093` anzeigen.
+Sie `docker run -p 8093:80 -d --name web dockerized-app`. Das stellt einen
+Container namens "web" auf Ihrem Rechner mit Port 8093 bereit. Ihr Browser
+sollte Ihre App also unter `http://localhost:8093/` anzeigen.
 
 Um den Container wieder zu stoppen, geben Sie `docker stop web` ein.
 
@@ -169,19 +170,26 @@ services:
 ```
 
 Um Ihren Container zu starten, verwenden Sie nun einfach `docker-compose up -d`.
-Um ihn zu stoppen, `docker-compose down`. Erstellen Sie das Image nach einer
-Änderung in Ihrer App neu, müssen Sie den Service erst beenden und dann neu
-starten. Auch hier bietet sich ein Skript an. Ich nenne es `redeploy.sh`:
+Vergessen Sie bitte nicht das `-d`, da Ihr Container sonst im Vordergrund läuft
+und Sie ihre Shell solange nicht mehr nutzen können, bis Sie ihn wieder beendet
+haben. Das erreichen Sie mit `docker-compose down`.
+
+Wenn Sie Ihre App ändern, müssen Sie ein neues Image bauen. Das geht schnell, da
+alle Images aus Layern bestehen, die Docker zwischenspeichert, und Ihre Änderung
+nur den letzten Layer (den mit dem
+`COPY dist/dockerized-app /usr/share/nginx/html`) betrifft. Um dieses neueste
+Image zur Ausführung zu bringen, müssen Sie den alten Container erst beenden und
+den neuen starten. Auch hier bietet sich ein Skript an. Ich nenne es
+`redeploy.sh`:
 
 ```bash
 #! /bin/bash
-export COMPOSE_HTTP_TIMEOUT=300
 docker-compose down --remove-orphans
 docker-compose up -d
 ```
 
-Damit haben Sie alles Nötige zur Hand, um Ihre App in einem Docker-Container zu
-betreiben.
+Damit haben Sie alles Nötige zur Hand, um Ihre App sinnvoll in einem
+Docker-Container zu betreiben.
 
 Im nächsten Artikel zeige ich Ihnen, wie Sie Ihre App von Docker aus
 konfigurieren können. Das ist dann wichtig, wenn Sie beispielsweise gegen ein
