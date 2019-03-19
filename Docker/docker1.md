@@ -48,6 +48,10 @@ COPY nginx/default.conf /etc/nginx/conf.d
 COPY dist/dockerized-app /usr/share/nginx/html
 ```
 
+Diese Datei verwendet das jeweils neueste `nginx`-Image als Basis, setzt darin
+Ihren Namen als den des Zuständigen, kopiert die Konfigurationsdatei und
+schließlich Ihre Angular-App in das Image.
+
 Falls Sie diese Anleitung mit Ihrer eigenen App nachvollziehen, setzen Sie für
 `dist/dockerized-app` bitte das entsprechende Verzeichnis Ihrer App ein.
 
@@ -82,7 +86,9 @@ yarn.lock
 Das Docker-Image mit Ihrer App können Sie nun erstellen, indem Sie folgende
 Beschwörungsformeln in der angegebenen Reihenfolge murmeln: `yarn install` (oder
 `npm install`, wenn Sie Ihre Pakete stattdessen mit `npm` verwalten),
-`ng build --prod` und schließlich `docker build -t dockerized-app .`.
+`ng build --prod` und schließlich `docker build -t dockerized-app .`. Auch hier
+sollten Sie das `dockerized-app` durch den Namen Ihrer App ersetzen, denn unter
+diesem Namen legt Docker das Image auf Ihrem Rechner ab.
 
 Ich bin ein großer Fan davon, all die Schritte zu automatisieren, die ich
 ständig wiederholen muss. Deshalb habe ich diese Schritte in einem
@@ -90,7 +96,7 @@ ständig wiederholen muss. Deshalb habe ich diese Schritte in einem
 
 ```bash
 #!/bin/bash
-yarn
+yarn install
 ng build --prod
 docker build -t dockerized-app .
 ```
@@ -147,17 +153,19 @@ dockerized-app  latest  419869cfab04   10 seconds ago  110MB
 
 Um nun einen Container auf Basis des eben erzeugten Image zu starten (zur
 Erinnerung: Container zu Image verhält sich wie Instanz zu Klasse), verwenden
-Sie `docker run -p 8093:80 -d --name web dockerized-app`. Das stellt einen
-Container namens "web" auf Ihrem Rechner mit Port 8093 bereit. Ihr Browser
-sollte Ihre App also unter `http://localhost:8093/` anzeigen.
+Sie `docker run -p 8093:80 -d --name web dockerized-app` (bzw. den Namen Ihrer
+App statt `dockerized-app`). Das stellt einen Container namens "web" auf Ihrem
+Rechner auf Port 8093 bereit. Ihr Browser sollte Ihre App also unter
+`http://localhost:8093/` anzeigen.
 
 Um den Container wieder zu stoppen, geben Sie `docker stop web` ein.
 
 Auch das können wir über ein Skript automatisieren. Gerade für komplexere
 Szenarien mit mehreren Containern hat Docker
-[docker-compose](https://docs.docker.com/compose/) bereitgestellt. Für unseren
-vereinfachten Anwendungsfall mit nur einem Service sieht die zugehörige
-Konfigurationsdatei `docker-compose.yml` folgendermaßen aus:
+[docker-compose](https://docs.docker.com/compose/) entwickelt. Für unseren
+vereinfachten Anwendungsfall mit nur einem Service sieht die zu obigem Aufruf
+über die Kommandozeile identische Konfigurationsdatei `docker-compose.yml`
+folgendermaßen aus:
 
 ```yaml
 version: "3"
@@ -174,9 +182,9 @@ Vergessen Sie bitte nicht das `-d`, da Ihr Container sonst im Vordergrund läuft
 und Sie ihre Shell solange nicht mehr nutzen können, bis Sie ihn wieder beendet
 haben. Das erreichen Sie mit `docker-compose down`.
 
-Wenn Sie Ihre App ändern, müssen Sie ein neues Image bauen. Das geht schnell, da
-alle Images aus Layern bestehen, die Docker zwischenspeichert, und Ihre Änderung
-nur den letzten Layer (den mit dem
+Jedes Mal, wenn Sie Ihre App ändern, müssen Sie ein neues Image bauen. Das geht
+schnell, da alle Images aus Schichten (engl. _layers_) bestehen, die Docker
+zwischenspeichert, und Ihre Änderung nur die letzte Schicht (die mit dem
 `COPY dist/dockerized-app /usr/share/nginx/html`) betrifft. Um dieses neueste
 Image zur Ausführung zu bringen, müssen Sie den alten Container erst beenden und
 den neuen starten. Auch hier bietet sich ein Skript an. Ich nenne es
