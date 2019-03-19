@@ -186,7 +186,57 @@ export function initSettings(
 export class AppModule {}
 ```
 
-Damit haben wir alle Puzzleteile zusammen, um die _Development_-Umgebung zum
-Laufen zu bringen.
+Damit haben wir bereits die _Development_-Umgebung zum Laufen gebracht. Sie
+können das mittels `ng serve` oder `ng serve --prod` leicht nachprüfen.
 
-## Die jeweilige Umgebung verwenden
+## Umgebung mit Docker konfigurieren
+
+Wie erzeugen wir jetzt also pro Umgebung eine passende `settings.json`-Datei je
+Container? Ich nutze dafür `envsubst`. Dieses liest ein Template, ersetzt darin
+Umgebungsvariablen und schreibt das Ergebnis in eine neue Datei.
+
+Hier ist das Template in Form der `src/assets/settings.json.template`-Datei:
+
+```json
+{
+    "baseUrl": "${BASE_URL}"
+}
+```
+
+Jetzt brauchen wir nur noch `docker-compose.yml` dahingehend anzupassen, dass es
+`envsubst` verwendet, um zur Laufzeit die passende
+`src/assets/settings.json`-Datei für die jeweilige Umgebung zu erstellen:
+
+```yaml
+version: "3"
+
+services:
+    web:
+        image: dockerized-app
+        env_file:
+            - ./docker.env
+        ports:
+            - "8093:80"
+        command:
+            /bin/bash -c "envsubst '$$BASE_URL' < \
+            /usr/share/nginx/html/assets/settings.json.template > \
+            /usr/share/nginx/html/assets/settings.json && \ exec nginx -g
+            'daemon off;'"
+```
+
+Wie Sie sehen, lädt `docker-compose` die Umgebung aus einer `docker.env`-Datei,
+die folgendermaßen aussieht:
+
+```bash
+BASE_URL=http://some.official.server:444
+```
+
+Damit haben wir endlich alle Puzzleteile zusammen, um den Docker-Container mit
+der gewünschten Umgebung zu starten. Sie brauchen lediglich die jeweils
+passenden Umgebungsvariablen zu setzen. Die `dockerize.sh`- und
+`redeploy.sh`-Skripte aus dem vorigen Teil funktionieren übrigens ohne Änderung
+weiterhin.
+
+Im letzten Teil der Artikelserie zeige ich Ihnen, wie sie die Buildumgebung über
+die Projektlaufzeit im Griff behalten, auch wenn Sie Ihr System durch neue
+Versionen der benötigten Werkzeuge verändern.
