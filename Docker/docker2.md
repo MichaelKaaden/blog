@@ -32,10 +32,9 @@ bringen weitere Konfigurationsoptionen keinen Mehrwehrt zu diesem Artikel hinzu,
 weshalb ich mich auf den `baseUrl` beschränken möchte.
 
 Sie sehen schon: Mit dem `environment.ts` und `environment.prod.ts` kommen wir
-da nicht ganz hin. Natürlich können wir noch ein `environment.staging.ts`
-definieren, doch das hilft uns nicht. Warum das so ist, sehen wir gleich, wenn
-wir uns überlegen, welche Anforderungen wir an die Konfigurierbarkeit unserer
-App haben.
+da nicht ganz hin. Natürlich könnten wir noch ein `environment.testing.ts` und
+ein `environment.staging.ts` definieren, doch das hilft uns nicht weiter, wie
+wir gleich sehen werden.
 
 ## Anforderungen an die Konfigurierbarkeit
 
@@ -44,13 +43,13 @@ In der _Development_-Umgebung soll die App ganz normal mit `ng serve` bzw.
 `baseUrl` auch ohne Docker zur Verfügung stellt.
 
 In den anderen Umgebungen möchten wir den jeweils passenden `baseUrl` zur
-Verfügung haben.
+Verfügung haben. Eine wesentliche Einschränkung dabei ist: Wir dürfen nicht
+damit anfangen, nur wegen eines jeweils anderen `baseUrl` ein Image je Umgebung
+zu erstellen.
 
-Eine wesentliche Einschränkung dabei ist: Wir dürfen nicht damit anfangen, nur
-wegen eines jeweils anderen `baseUrl` ein Image je Umgebung zu erstellen. Wenn
-ein Image in _Testing_ für gut befunden wurde, egal ob durch automatische oder
-manuelle Tests, dann ist genau dieses Image dasjenige, das nach _Staging_ und
-nach erfolgreicher Abnahme nach _Production_ wandern soll. Wir dürfen _kein_
+Wenn ein Image in _Testing_ für gut befunden wurde, egal ob durch automatische
+oder manuelle Tests, dann ist genau dieses Image dasjenige, das nach _Staging_
+und nach erfolgreicher Abnahme nach _Production_ wandern soll. Wir dürfen _kein_
 neues Image erstellen, denn das könnte geringfügig anders sein als das
 getestete, beispielsweise weil in der Zwischenzeit Ihre geschätzten
 Admin-Kollegen automatisiert eine neue `Node.js`-Version auf Ihrem Rechner
@@ -66,4 +65,128 @@ Zusammengefasst benötigen wir also eine Lösung, die uns in der
 _Development_-Umgebung einen `baseUrl` auch ohne Docker zur Verfügung stellt,
 die uns aber einen Weg ebnet, den `baseUrl` mit Docker zu konfigurieren.
 
-## Konfigurierbarkeit herstellen
+## Konfigurierbarkeit umsetzen
+
+Um diese Anforderungen umsetzen zu können, benötigen wir einen Mechanismus, der
+die Konfiguration der App erst zur Laufzeit lädt. Würden wir das
+`environment.ts` für diesen Zweck nutzen, dann müsste die Konfiguration schon
+beim _Build_ feststehen, was aber nicht sein darf, wie wir im vorangehenden
+Kapitel festgestellt haben.
+
+Eine Lösung dafür ist, die Konfiguration in eine Datei zu packen, die wir im
+`assets`-Verzeichnis ablegen und von dort zusammen mit der App laden. Auf diese
+Weise können wir diese Konfigurationsdatei beim Start des Containers beliebig
+überschreiben. Wir ändern die Konfiguration dadurch zur _Laufzeit_. Wir sehen
+gleich, wie wir das bewerkstelligen.
+
+Hier ist die `src/assets/settings.json`-Datei, die wir zu diesem Zweck verwenden
+werden.
+
+```json
+{
+    "baseUrl": "http://localhost:5002"
+}
+```
+
+Definieren wir ein `Settings`-Interface, das der Struktur der
+Konfigurationsdatei entspricht:
+
+```typescript
+export interface Settings {
+    baseUrl: string;
+}
+```
+
+Jetzt brauchen wir noch einen `SettingsService`, den wir überall da injizieren
+können, wo wir Zugriff auf die Konfiguration benötigen.
+
+```typescript
+import { Injectable } from "@angular/core";
+import { Settings } from "../models/settings";
+
+@Injectable({
+    providedIn: "root",
+})
+export class SettingsService {
+    settings: Settings;
+}
+```
+
+Sehen wir uns den `SettingsInitializerService` an, der für das Laden der
+`src/assets/settings.json` verantwortlich ist:
+
+```typescript
+import { HttpClient } from "@angular/common/http";
+import { Injectable } from "@angular/core";
+import { Settings } from "../models/settings";
+import { SettingsService } from "./settings.service";
+
+@Injectable({
+    providedIn: "root",
+})
+export class SettingsInitializerService {
+    constructor(private http: HttpClient, private settings: SettingsService) {}
+
+    initializeSettings(): Promise<any> {
+        return new Promise((resolve, reject) => {
+            this.http
+                .get("assets/settings.json")
+                .toPromise()
+                .then((response) => {
+                    this.settings.settings = response as Settings;
+                    resolve();
+                })
+                .catch((error) => reject(error));
+        });
+    }
+}
+```
+
+Das war noch nicht weiter kompliziert. Spannend wird es, wenn wir die
+Konfiguration aus dem `settings.json` laden wollen. Die App braucht die
+Konfiguration, sobald der Browser sie startet. Dummerweise lädt die App die
+Konfiguration aus dem `assets`-Verzeichnis und somit per HTTP(S)-Aufruf, somit
+also asynchron. Wir brauchen also ein Mittel, um das Laden abzuwarten, bevor die
+App startet. Glücklicherweise hat Angular dafür das Konzept des
+`APP_INITIALIZER` eingeführt, das genau das leistet.
+
+Passen wir also das `app.module.ts` mit dieser Erkenntnis folgendermaßen an, um
+die Konfiguration zu laden:
+
+```typescript
+import { HttpClientModule } from "@angular/common/http";
+import { BrowserModule } from "@angular/platform-browser";
+import { APP_INITIALIZER, NgModule } from "@angular/core";
+
+import { AppRoutingModule } from "./app-routing.module";
+import { AppComponent } from "./components/app/app.component";
+import { OneComponent } from "./components/one/one.component";
+import { TwoComponent } from "./components/two/two.component";
+import { SettingsInitializerService } from "./services/settings-initializer.service";
+
+export function initSettings(
+    settingsInitializerService: SettingsInitializerService,
+) {
+    return () => settingsInitializerService.initializeSettings();
+}
+
+@NgModule({
+    declarations: [AppComponent, OneComponent, TwoComponent],
+    imports: [BrowserModule, AppRoutingModule, HttpClientModule],
+    providers: [
+        {
+            provide: APP_INITIALIZER,
+            useFactory: initSettings,
+            deps: [SettingsInitializerService],
+            multi: true,
+        },
+    ],
+    bootstrap: [AppComponent],
+})
+export class AppModule {}
+```
+
+Damit haben wir alle Puzzleteile zusammen, um die _Development_-Umgebung zum
+Laufen zu bringen.
+
+## Die jeweilige Umgebung verwenden
