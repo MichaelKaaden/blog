@@ -1,7 +1,7 @@
 # Angular-App über Docker bereitstellen
 
 Sie finden den Code zum Artikel auf
-[GitHub](https://github.com/MichaelKaaden/dockerized-app/Part-1-Simple-Case).
+[GitHub](https://github.com/MichaelKaaden/dockerized-app/tree/master/Part-1-Simple-Case).
 
 Es ist ganz einfach, eine Angular-App zu "dockerisieren". Sie brauchen keinerlei
 Code in Ihrer App ändern, um sie in einem Docker-Containers zu betreiben. Sie
