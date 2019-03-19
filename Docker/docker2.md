@@ -32,7 +32,10 @@ bringen weitere Konfigurationsoptionen keinen Mehrwehrt zu diesem Artikel hinzu,
 weshalb ich mich auf den `baseUrl` beschränken möchte.
 
 Sie sehen schon: Mit dem `environment.ts` und `environment.prod.ts` kommen wir
-da nicht ganz hin.
+da nicht ganz hin. Natürlich können wir noch ein `environment.staging.ts`
+definieren, doch das hilft uns nicht. Warum das so ist, sehen wir gleich, wenn
+wir uns überlegen, welche Anforderungen wir an die Konfigurierbarkeit unserer
+App haben.
 
 ## Anforderungen an die Konfigurierbarkeit
 
