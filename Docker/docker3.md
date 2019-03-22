@@ -72,21 +72,21 @@ erfolgreichen Build nicht mehr brauchen. Alleine das `node_modules`-Verzeichnis
 einer Angular-App ist schon fast 500MB groß. Zusammen mit Google Chrome und
 Node.js sind Sie somit bei rund 1GB pro Image. Und Sie wissen ja: Uns reicht ein
 nginx-Image mit der Kopie des `dist/<meine app>`-Verzeichnisses, das lediglich
-rund 110MB groß wäre.
+rund 100MB groß wäre.
 
 Damit ist unser Plan klar: Wir bauen die App im einen Container und erzeugen aus
-dem dort erzeugten Ergebnis ein neues, minimales Image. Zu unserem Glück ist das
-ein Problem, das nicht nur uns beschäftigt, so dass Docker eine Lösung für genau
-diesen Anwendungsfall bietet: Die sog. _Multi-Stage Builds_.
+dem Ergebnis ein neues, minimales Image. Zu unserem Glück ist das ein Problem,
+das nicht nur uns beschäftigt, so dass Docker eine Lösung für genau diesen
+Anwendungsfall bietet: Den sog. _Multi-Stage Build_.
 
 ## Multi-Stage Builds
 
 Multi-Stage Builds kaskadieren den Build mehrerer Images und kopieren dabei
 Daten vom Vorgänger in den Nachfolger -- letzten Endes können Sie sich das wie
-bei (UNIX-)Pipes und -Prozessen vorstellen: Die Ausgabe vom einen Image wandert
-in das nächste.
+bei Prozessen und Pipes unter UNIX vorstellen: Die Ausgabe vom einen Image
+wandert in das nächste.
 
-In unserem Fall muss das erste Image die App bauen, während das zweite Image die
+In unserem Fall muss das erste Image die App bauen, während das zweite die
 erzeugte App aufnimmt. Daher muss das erste Image Node.js, npm, @angular/cli und
 Google Chrome enthalten. Das zweite Image ist identisch mit dem, das wir in den
 bisherigen Teilen der Artikelserie entwickelt haben, bezieht die App aber aus
@@ -110,9 +110,9 @@ dist
 node_modules
 ```
 
-Nun müssen wir die `src/karma.conf.js` anpassen, damit Google Chrome auf Debian
-GNU/Linux funktioniert. Fügen Sie dem `config.set({...})`-Abschnitt folgendes
-hinzu:
+Nun müssen wir die `src/karma.conf.js` anpassen, damit Google Chrome im Headless
+Mode in einem Container unter Debian GNU/Linux funktioniert. Fügen Sie dazu dem
+`config.set({...})`-Abschnitt folgendes hinzu:
 
 ```
 customLaunchers: {
@@ -308,8 +308,9 @@ Entscheidung ist meiner Meinung nach einfach. Wenn Sie mit den
 Ihre App in einen Container zu packen. Möchten Sie die App in mehreren
 Umgebungen betreiben und deswegen die Konfiguration ändern, landen Sie
 automatisch bei der Lösung aus Teil II. Und wenn es Ihnen wichtig ist, Ihre
-Build-Umgebung im Griff zu haben, landen Sie bei den Multi-Stage Builds aus
-diesem Beitrag, die Sie mit jeder der beiden Methoden kombinieren können.
+Build-Umgebung im Griff zu haben, verwenden Sie den Multi-Stage Build aus diesem
+Artikel, die Sie mit jeder der beiden zuvor genannten Methoden kombinieren
+können.
 
 Wie auch immer Sie sich entscheiden: Sie werden schnell merken, wie angenehm es
 ist, Ihre App mit Docker zum Laufen zu bringen.
