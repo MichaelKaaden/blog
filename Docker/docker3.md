@@ -82,9 +82,11 @@ Anwendungsfall bietet: Den sog. _Multi-Stage Build_.
 ## Multi-Stage Builds
 
 Multi-Stage Builds kaskadieren den Build mehrerer Images und kopieren dabei
-Daten vom Vorgänger in den Nachfolger -- letzten Endes können Sie sich das wie
-bei Prozessen und Pipes unter UNIX vorstellen: Die Ausgabe vom einen Image
-wandert in das nächste.
+Daten vom Vorgänger in den Nachfolger. Lediglich das letzte Image ist dabei Ihr
+Ergebnis, die Vorgänger spielen keine Rolle mehr (werden aber gecachet, um den
+nächsten Build zu beschleunigen). Letzten Endes können Sie sich das wie bei
+Prozessen und Pipes unter UNIX vorstellen: Die Ausgabe vom Vorgänger landet im
+Nachfolger.
 
 In unserem Fall muss das erste Image die App bauen, während das zweite die
 erzeugte App aufnimmt. Daher muss das erste Image Node.js, npm, @angular/cli und
@@ -127,7 +129,8 @@ Hintergrund ist, dass wir das Sandboxing ausschalten müssen, damit die Tests
 ausgeführt werden. Da wir dank Docker in einer anderen Art Sandbox bauen, tut
 uns das nicht wirklich weh.
 
-Num müssen wir unser `Dockerfile` um das Image zum Build der App zu erweitern:
+Als nächstes müssen wir unser `Dockerfile` um das Image zum Build der App
+erweitern:
 
 ```dockerfile
 FROM node:10-alpine as node

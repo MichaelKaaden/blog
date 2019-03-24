@@ -14,9 +14,9 @@ spricht das Backend über einen URL an, der irgendwo in der App abgelegt sein
 muss. Das Angular-Team [stellt sich vor](https://angular.io/guide/build), dass
 Sie diesen in `src/environments/environment.ts` bzw.
 `src/environments/environment.prod.ts` ablegen, beispielsweise unter dem Namen
-`baseUrl.
+`baseUrl`.
 
-Das klappt gut, solange Sie mit dieseb beiden Umgebungen auskommen. Gerade wenn
+Das klappt gut, solange Sie mit diesen beiden Umgebungen auskommen. Gerade wenn
 Sie in einem Team entwickeln, werden Sie jedoch mindestens vier Umgebungen
 verwenden:
 
