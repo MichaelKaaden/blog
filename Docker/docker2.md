@@ -186,6 +186,28 @@ export function initSettings(
 export class AppModule {}
 ```
 
+Nun können wir den `SettingsService` verwenden.
+
+```typescript
+import { Component } from "@angular/core";
+import { Settings } from "../../models/settings";
+import { SettingsService } from "../../services/settings.service";
+
+@Component({
+    selector: "app-root",
+    templateUrl: "./app.component.html",
+    styleUrls: ["./app.component.scss"],
+})
+export class AppComponent {
+    title = "dockerized-app";
+    settings: Settings;
+
+    constructor(private settingsService: SettingsService) {
+        this.settings = settingsService.settings;
+    }
+}
+```
+
 Damit haben wir bereits die _Development_-Umgebung zum Laufen gebracht. Sie
 können das mittels `ng serve` oder `ng serve --prod` leicht nachprüfen.
 
