@@ -12,8 +12,8 @@ vorstelle.
 
 Als Web-Server werden wir [nginx](http://nginx.org/) verwenden. Keine Sorge,
 wenn Sie diesen noch nie selbst benutzt, geschweige denn konfiguriert haben.
-Erstellen Sie im Wurzelverzeichnis Ihrer App ein `nginx`-Verzeichnis und legen
-Sie darin eine Datei namens `default.conf` mit folgendem Inhalt an:
+Erstellen Sie im Wurzelverzeichnis Ihrer App ein Verzeichnis namens `nginx` und
+legen Sie darin eine Datei namens `default.conf` mit folgendem Inhalt an:
 
 ```nginx
 server {
@@ -85,10 +85,11 @@ yarn.lock
 
 Das Docker-Image mit Ihrer App können Sie nun erstellen, indem Sie folgende
 Beschwörungsformeln in der angegebenen Reihenfolge murmeln: `yarn install` (oder
-`npm install`, wenn Sie Ihre Pakete stattdessen mit `npm` verwalten),
-`ng build --prod` und schließlich `docker build -t dockerized-app .`. Auch hier
-sollten Sie das `dockerized-app` durch den Namen Ihrer App ersetzen, denn unter
-diesem Namen legt Docker das Image auf Ihrem Rechner ab.
+`npm install`, wenn Sie Ihre Pakete stattdessen mit `npm` verwalten), `ng build
+--prod` und schließlich `docker build -t dockerized-app .` (bitte vergessen Sie
+den Punkt am Ende nicht!). Auch hier sollten Sie das `dockerized-app` durch den
+Namen Ihrer App ersetzen, denn unter diesem Namen legt Docker das Image auf
+Ihrem Rechner ab.
 
 Ich bin ein großer Fan davon, all die Schritte zu automatisieren, die ich
 ständig wiederholen muss. Deshalb habe ich diese Schritte in einem
@@ -156,7 +157,9 @@ Erinnerung: Container zu Image verhält sich wie Instanz zu Klasse), verwenden
 Sie `docker run -p 8093:80 -d --name web dockerized-app` (bzw. den Namen Ihrer
 App statt `dockerized-app`). Das stellt einen Container namens "web" auf Ihrem
 Rechner auf Port 8093 bereit. Ihr Browser sollte Ihre App also unter
-`http://localhost:8093/` anzeigen.
+`http://localhost:8093/` anzeigen, falls sie den Container auf Ihrer Workstation
+gestartet haben. Ansonsten verwenden Sie bitte den passenden Rechnernamen statt
+`localhost`.
 
 Um den Container wieder zu stoppen, geben Sie `docker stop web` ein.
 

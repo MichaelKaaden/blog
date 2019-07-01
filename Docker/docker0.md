@@ -11,7 +11,7 @@ Web-Server zum Laufen bringen und die Begeisterungsstürme Ihrer Nutzer abwarten
 
 Im Prinzip ist es dank [@angular/cli](https://cli.angular.io/) sehr einfach,
 eine für den Produktivmodus geeignete Version Ihrer App zu erzeugen: Sie rufen
-lediglich `ng build —prod` auf und kopieren anschließend den Inhalt des
+lediglich `ng build --prod` auf und kopieren anschließend den Inhalt des
 Verzeichnisses `dist/<app-name>` auf den Rechner, auf dem der Web-Server läuft.
 Im Web-Server, sei es ein Apache, nginx oder was auch immer, tragen Sie dann den
 Verzeichnispfad ein, unter dem sie die App abgelegt haben, und sorgen dafür,
@@ -20,9 +20,9 @@ dass jede Anfrage auf `index.html` gemappt wird.
 ## Problemstellung
 
 In naher Zukunft werden Sie Bugs in der App fixen und neue Features einbauen.
-Jedes Mal werden Sie deswegen eine neue Version erstellen müssen. Wie können Sie
-sicherstellen, dass die jeweils passende Version ihren Weg auf Ihren Web-Server
-findet?
+Jedes Mal werden Sie deswegen eine neue Version Ihrer App erstellen müssen. Wie
+können Sie sicherstellen, dass die jeweils passende Version ihren Weg auf Ihren
+Web-Server findet?
 
 Vielleicht erstellen Sie die App ja auch im Kundenauftrag im Rahmen eines agilen
 Entwicklungsprozesses. Der Kunde will dann nicht nur die jeweils aktuelle
@@ -136,5 +136,6 @@ Die Artikelserie besteht aus den folgenden Teilen:
 3. Multi-Stage Builds oder: Immer die Build-Umgebung dabei haben
 
 Für den Rest der Artikelserie gehe ich davon aus, dass Docker auf Ihrem System
-einwandfrei funktioniert. Wie Sie das prüfen können, zeigt der o. g. _Getting
-Started Guide_.
+einwandfrei funktioniert. Wie Sie das prüfen können, zeigt der o. g. [_Getting
+Started Guide_](https://docs.docker.com/get-started/#test-docker-installation).
+

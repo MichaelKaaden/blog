@@ -28,10 +28,10 @@ verwenden:
 Jede dieser Umgebungen hat typischerweise ihr eigenes Backend und benötigt somit
 einen spezifischen `baseUrl`. In der Realität werden Sie noch mehr zu
 konfigurieren haben, etwa einen Identity Provider für die Autorisierung, doch
-bringen weitere Konfigurationsoptionen keinen Mehrwehrt zu diesem Artikel hinzu,
-weshalb ich mich auf den `baseUrl` beschränken möchte.
+fügen weitere Konfigurationsoptionen diesem Artikel keinen Mehrwert hinzu,
+weshalb ich mich auf den `baseUrl` beschränke.
 
-Sie sehen schon: Mit dem `environment.ts` und `environment.prod.ts` kommen wir
+Sie sehen schon: Mit nur `environment.ts` und `environment.prod.ts` kommen wir
 da nicht ganz hin. Natürlich könnten wir noch ein `environment.testing.ts` und
 ein `environment.staging.ts` definieren, doch das hilft uns nicht weiter, wie
 wir gleich sehen werden.
@@ -42,10 +42,9 @@ In der _Development_-Umgebung soll die App ganz normal mit `ng serve` bzw.
 `ng serve --prod` laufen können. Wir brauchen also eine Lösung, die den
 `baseUrl` auch ohne Docker zur Verfügung stellt.
 
-In den anderen Umgebungen möchten wir den jeweils passenden `baseUrl` zur
-Verfügung haben. Eine wesentliche Einschränkung dabei ist: Wir dürfen nicht
-damit anfangen, nur wegen eines jeweils anderen `baseUrl` ein Image je Umgebung
-zu erstellen.
+In den anderen Umgebungen möchten wir den jeweils passenden `baseUrl` nutzen.
+Eine wesentliche Einschränkung dabei ist: Wir dürfen nicht damit anfangen, nur
+wegen eines jeweils anderen `baseUrl` ein Image je Umgebung zu erstellen.
 
 Wenn ein Image in _Testing_ für gut befunden wurde, egal ob durch automatische
 oder manuelle Tests, dann ist genau dieses Image dasjenige, das nach _Staging_
@@ -63,7 +62,8 @@ sondern von außen über Docker konfigurierbar sein muss.
 
 Zusammengefasst benötigen wir also eine Lösung, die uns in der
 _Development_-Umgebung einen `baseUrl` auch ohne Docker zur Verfügung stellt,
-die uns aber einen Weg ebnet, den `baseUrl` mit Docker zu konfigurieren.
+die uns aber einen Weg ebnet, den `baseUrl` für die anderen Umgebungen mit
+Docker zu konfigurieren.
 
 ## Konfigurierbarkeit umsetzen
 
@@ -71,9 +71,9 @@ Um diese Anforderungen umsetzen zu können, benötigen wir einen Mechanismus, de
 die Konfiguration der App erst zur Laufzeit lädt. Würden wir das
 `environment.ts` für diesen Zweck nutzen, dann müsste die Konfiguration schon
 beim _Build_ feststehen, was aber nicht sein darf, wie wir im vorangehenden
-Kapitel festgestellt haben.
+Abschnitt festgestellt haben.
 
-Eine Lösung dafür ist, die Konfiguration in eine Datei zu packen, die wir im
+Eine gute Lösung ist, die Konfiguration in eine Datei zu packen, die wir im
 `assets`-Verzeichnis ablegen und von dort zusammen mit der App laden. Auf diese
 Weise können wir diese Konfigurationsdatei beim Start des Containers beliebig
 überschreiben. Wir ändern die Konfiguration dadurch zur _Laufzeit_. Wir sehen
@@ -88,8 +88,9 @@ werden.
 }
 ```
 
-Definieren wir ein `Settings`-Interface, das der Struktur der
-Konfigurationsdatei entspricht:
+Definieren Sie mittels `ng g class models/settings --skip-tests` in der Datei
+`settings.ts` ein Interface, das der Struktur dieser Konfigurationsdatei
+entspricht:
 
 ```typescript
 export interface Settings {
@@ -98,7 +99,8 @@ export interface Settings {
 ```
 
 Jetzt brauchen wir noch einen `SettingsService`, den wir überall da injizieren
-können, wo wir Zugriff auf die Konfiguration benötigen.
+können, wo wir Zugriff auf die Konfiguration benötigen. Erstellen Sie ihn mit
+`ng g service services/settings`.
 
 ```typescript
 import { Injectable } from "@angular/core";
@@ -113,7 +115,8 @@ export class SettingsService {
 ```
 
 Sehen wir uns den `SettingsInitializerService` an, der für das Laden der
-`src/assets/settings.json` verantwortlich ist:
+`src/assets/settings.json` verantwortlich ist. Sie erzeugen ihn mittels `ng g
+service services/settings-initializer --dry-run`:
 
 ```typescript
 import { HttpClient } from "@angular/common/http";
@@ -151,7 +154,9 @@ App startet. Glücklicherweise hat Angular dafür das Konzept des
 `APP_INITIALIZER` eingeführt, das genau das leistet.
 
 Passen wir also das `app.module.ts` mit dieser Erkenntnis folgendermaßen an, um
-die Konfiguration zu laden:
+die Konfiguration zu laden. Tipp: Neu darin sind die Funktion `initSettings()`
+vor dem `@NgModule`-Decorator und der Provider.
+
 
 ```typescript
 import { HttpClientModule } from "@angular/common/http";
@@ -186,7 +191,7 @@ export function initSettings(
 export class AppModule {}
 ```
 
-Nun können wir den `SettingsService` verwenden.
+Damit können wir den `SettingsService` verwenden.
 
 ```typescript
 import { Component } from "@angular/core";
@@ -239,25 +244,24 @@ services:
             - ./docker.env
         ports:
             - "8093:80"
-        command:
-            /bin/bash -c "envsubst '$$BASE_URL' < \
+        command: /bin/bash -c "envsubst '$$BASE_URL' < \
             /usr/share/nginx/html/assets/settings.json.template > \
             /usr/share/nginx/html/assets/settings.json && \ exec nginx -g
             'daemon off;'"
 ```
 
-Wie Sie sehen, lädt `docker-compose` die Umgebung aus einer `docker.env`-Datei,
-die folgendermaßen aussieht:
+Mit dieser Änderung lädt `docker-compose` die Umgebung aus einer `docker.env`-Datei,
+die Sie bitte mit folgendem Inhalt anlegen:
 
 ```bash
 BASE_URL=http://some.official.server:444
 ```
 
 Damit haben wir endlich alle Puzzleteile zusammen, um den Docker-Container mit
-der gewünschten Umgebung zu starten. Sie brauchen lediglich die jeweils
-passenden Umgebungsvariablen zu setzen. Die `dockerize.sh`- und
-`redeploy.sh`-Skripte aus dem vorigen Teil funktionieren übrigens ohne Änderung
-weiterhin.
+der gewünschten Umgebung zu starten: Sie brauchen je Umgebung lediglich eine
+`docker.env`-Datei anzulegen und darin die jeweils passenden Umgebungsvariablen
+zu setzen. Die `dockerize.sh`- und `redeploy.sh`-Skripte aus dem vorigen Teil
+funktionieren übrigens ohne Änderung weiterhin.
 
 Im letzten Teil der Artikelserie zeige ich Ihnen, wie sie die Buildumgebung über
 die Projektlaufzeit im Griff behalten, auch wenn Sie Ihr System durch neue

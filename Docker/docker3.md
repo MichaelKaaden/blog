@@ -22,7 +22,7 @@ durch, übergeben es dem Betrieb oder dem Kunden -- und dann fassen Sie es
 solange nicht mehr an, bis sich jemand bei Ihnen meldet und nach Änderungen
 verlangt.
 
-Das ist dann der Moment, zu dem Sie den Staub vom Projekt pusten und sich
+Das ist dann der Moment, an dem Sie den Staub vom Projekt pusten und sich
 vielleicht als erstes fragen, wie Sie das damals gebaut haben. Beschränken wir
 uns auf TypeScript- oder JavaScript-Projekte, dann haben Sie vielleicht in der
 `scripts`-Section im `package.json` das entsprechende Kommando hinterlegt.
@@ -69,10 +69,10 @@ Die Antwort ist ganz einfach: Das würde prima funktionieren, nur leider würde
 das dabei entstehende Image sehr groß -- schließlich sind alle Tools und das
 komplette `node_modules`-Verzeichnis Teil des Image, obwohl Sie diese nach dem
 erfolgreichen Build nicht mehr brauchen. Alleine das `node_modules`-Verzeichnis
-einer Angular-App ist schon fast 500MB groß. Zusammen mit Google Chrome und
-Node.js sind Sie somit bei rund 1GB pro Image. Und Sie wissen ja: Uns reicht ein
-nginx-Image mit der Kopie des `dist/<meine app>`-Verzeichnisses, das lediglich
-rund 100MB groß wäre.
+einer Angular-App ist schon fast 500MB groß. Zusammen mit Google Chrome für die
+Unit Tests und Node.js sind Sie somit bei rund 1GB pro Image. Und Sie wissen ja:
+Uns reicht ein nginx-Image mit der Kopie des `dist/<meine app>`-Verzeichnisses,
+das lediglich rund 100MB groß wäre.
 
 Damit ist unser Plan klar: Wir bauen die App im einen Container und erzeugen aus
 dem Ergebnis ein neues, minimales Image. Zu unserem Glück ist das ein Problem,
@@ -92,7 +92,7 @@ In unserem Fall muss das erste Image die App bauen, während das zweite die
 erzeugte App aufnimmt. Daher muss das erste Image Node.js, npm, @angular/cli und
 Google Chrome enthalten. Das zweite Image ist identisch mit dem, das wir in den
 bisherigen Teilen der Artikelserie entwickelt haben, bezieht die App aber aus
-dem ersten Image statt aus dem `dist`-Verzeichnis wie bisher.
+dem ersten Image statt aus dem `dist`-Verzeichnis.
 
 Soviel zum Plan, nun setzen wir das Ganze um.
 
