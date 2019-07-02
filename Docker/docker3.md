@@ -126,11 +126,10 @@ customLaunchers: {
 ```
 
 Hintergrund ist, dass wir das Sandboxing ausschalten müssen, damit die Tests
-ausgeführt werden. Da wir dank Docker in einer anderen Art Sandbox bauen, tut
-uns das nicht wirklich weh.
+ausgeführt werden. Da Sie selbst den Container unter Kontrolle haben, sollte
+dieses Risiko akzeptabel sein.
 
-Als nächstes müssen wir unser `Dockerfile` um das Image zum Build der App
-erweitern:
+Als nächstes müssen wir unser `Dockerfile` erweitern:
 
 ```dockerfile
 FROM node:10-alpine as node
@@ -178,8 +177,11 @@ COPY --from=node /usr/src/app/dist/dockerized-app /usr/share/nginx/html
 
 Eine kurze Erklärung dazu: Dieses Dockerfile basiert auf einem Image mit Node.js
 10 und legt darin @angular/cli und den Chromium-Browser ab. Anschließend baut es
-die App, genau so, wie wir es bisher von Hand getan haben. Im zweiten Schritt
-kopiert es die fertiggestellte App aus dem ersten Image in das zweite.
+die App, genau so, wie wir es bisher von Hand getan haben -- na, nicht ganz, wir
+lassen nun die Tests laufen, denn das gehört doch sicher auch bei Ihnen dazu,
+nicht wahr? Ansonsten kommentieren Sie die "RUN ng test ..."-Zeile einfach aus.
+Im zweiten Schritt (gekennzeichnet durch den Kommentar "Stage 2") kopiert es die
+fertiggestellte App aus dem ersten Image in das zweite.
 
 Die entscheidenden Stellen sind `FROM node:10-alpine as node`, die die
 Bezeichnung `node` für das erste Image vorgibt, und `COPY --from=node ...`, die
@@ -269,6 +271,10 @@ Successfully built 990a8e08cc46
 Successfully tagged dockerized-app:latest
 ```
 
+Wenn Sie das Meldungspaar "Successfully built .../Successfully tagged ..."
+sehen, haben Sie es geschafft: Der Multi-Stage Build hat geklappt. Führen Sie
+Ihren Container nun aus:
+
 ```console
 $ ./redeploy.sh
 Removing network dockerized-app_default
@@ -276,6 +282,13 @@ WARNING: Network dockerized-app_default not found.
 Creating network "dockerized-app_default" with the default driver
 Creating dockerized-app_web_1 ... done
 ```
+
+Der so erzeugte Container sollte nun genauso funktionieren wie der aus dem
+vorigen Teil dieser Artikelserie. Die Verbesserung besteht jetzt darin, dass Sie
+alles, was Sie zum Build benötigen, in Ihrem Projekt beschreiben und das in
+Ihrer Quellcodeverwaltung mit versionieren können. Sie haben dadurch keinen
+Performance-Nachteil, da Docker den ersten Stage cachet -- lediglich der zweite
+Stage muss jedes Mal erstellt werden, wenn Sie etwas an Ihrer App ändern.
 
 ## Vergleich
 
@@ -292,7 +305,7 @@ Wie Sie sehen, gibt es keinen spürbaren Unterschied zwischen den Image-Größen
 Das ist natürlich kein Zufall: In den ersten beiden Teilen haben wir die App von
 Hand gebaut und das `dist/dockerized-app` in das Image kopiert. In diesem
 Blogbeitrag haben wir den Build in ein Image im ersten Stage verlagert und von
-da aus kopiert. Es war also zu erwarten, dass sich die Größe des finalen Image
+da aus kopiert. Es war also zu erwarten, dass sich die Größe des finalen Images
 nicht ändert.
 
 Spaßeshalber habe ich die Größe des ersten Stage des Multi-Stage Builds
@@ -304,6 +317,8 @@ gemessen:
 
 1GB ist eine stolze Größe. Würden wir unsere App mit diesem Image betreiben,
 hätten wir den zehnfachen Speicherbedarf...
+
+## Fazit
 
 Welche Methode sollten Sie also für Ihren Anwendungsfall wählen? Die
 Entscheidung ist meiner Meinung nach einfach. Wenn Sie mit den
@@ -318,11 +333,11 @@ können.
 Wie auch immer Sie sich entscheiden: Sie werden schnell merken, wie angenehm es
 ist, Ihre App mit Docker zum Laufen zu bringen.
 
-Und falls Sie sich doch entscheiden, einen Build Server wie Jenkins zu
-installieren und passend einzurichten, beschränkt sich Ihre finale Tätigkeit in
-jedem Projekt auf ein `git push`, woraufhin der Build Server die neueste Version
-Ihres Projekts auscheckt, den Multi-Stage Build auslöst und das Ergebnis auf dem
-Zielsystem zum Laufen bringt.
+Und falls Sie sich doch einmal dafür entscheiden, einen Build Server wie Jenkins
+zu installieren und passend einzurichten, beschränkt sich Ihre finale Tätigkeit
+in jedem Projekt auf ein `git push`, woraufhin der Build Server die neueste
+Version Ihres Projekts auscheckt, den Multi-Stage Build auslöst und das Ergebnis
+auf dem Zielsystem zum Laufen bringt.
 
 Somit können Sie sich in Zukunft auf Ihre Kernkompetenzen beschränken und das
 tun, was Ihnen Spaß macht. Um den Build und das Deployment kümmern sich Ihre
