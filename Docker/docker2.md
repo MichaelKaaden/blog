@@ -116,7 +116,7 @@ export class SettingsService {
 
 Sehen wir uns den `SettingsInitializerService` an, der für das Laden der
 `src/assets/settings.json` verantwortlich ist. Sie erzeugen ihn mittels `ng g
-service services/settings-initializer --dry-run`:
+service services/settings-initializer`:
 
 ```typescript
 import { HttpClient } from "@angular/common/http";
@@ -148,7 +148,7 @@ export class SettingsInitializerService {
 Das war noch nicht weiter kompliziert. Spannend wird es, wenn wir die
 Konfiguration aus dem `settings.json` laden wollen. Die App braucht die
 Konfiguration, sobald der Browser sie startet. Dummerweise lädt die App die
-Konfiguration aus dem `assets`-Verzeichnis und somit per HTTP(S)-Aufruf, somit
+Konfiguration aus dem `assets`-Verzeichnis per HTTP(S)-Aufruf, somit
 also asynchron. Wir brauchen also ein Mittel, um das Laden abzuwarten, bevor die
 App startet. Glücklicherweise hat Angular dafür das Konzept des
 `APP_INITIALIZER` eingeführt, das genau das leistet.
