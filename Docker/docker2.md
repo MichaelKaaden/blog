@@ -246,9 +246,12 @@ services:
             - "8093:80"
         command: /bin/bash -c "envsubst '$$BASE_URL' < \
             /usr/share/nginx/html/assets/settings.json.template > \
-            /usr/share/nginx/html/assets/settings.json && \ exec nginx -g
+            /usr/share/nginx/html/assets/settings.json && exec nginx -g \
             'daemon off;'"
 ```
+
+_Sie müssen die `command`-Angabe in *eine* einzige Zeile packen. Im obigen Beispiel habe ich die
+Backslashes lediglich dazu benutzt, die Zeile der Lesbarkeit wegen umzubrechen._
 
 Mit dieser Änderung lädt `docker-compose` die Umgebung aus einer `docker.env`-Datei,
 die Sie bitte mit folgendem Inhalt anlegen:
