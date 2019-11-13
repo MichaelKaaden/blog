@@ -1,5 +1,8 @@
 # Angular-App über Docker bereitstellen
 
+> First Steps: Wie man Angular-App in ein Docker-Image packt und in einem
+> Container bequem zur Ausführung bringt.
+
 Sie finden den Code zum Artikel auf
 [GitHub](https://github.com/MichaelKaaden/dockerized-app/tree/master/Part-1-Simple-Case).
 
@@ -85,11 +88,11 @@ yarn.lock
 
 Das Docker-Image mit Ihrer App können Sie nun erstellen, indem Sie folgende
 Beschwörungsformeln in der angegebenen Reihenfolge murmeln: `yarn install` (oder
-`npm install`, wenn Sie Ihre Pakete stattdessen mit `npm` verwalten), `ng build
---prod` und schließlich `docker build -t dockerized-app .` (bitte vergessen Sie
-den Punkt am Ende nicht!). Auch hier sollten Sie das `dockerized-app` durch den
-Namen Ihrer App ersetzen, denn unter diesem Namen legt Docker das Image auf
-Ihrem Rechner ab.
+`npm install`, wenn Sie Ihre Pakete stattdessen mit `npm` verwalten),
+`ng build --prod` und schließlich `docker build -t dockerized-app .` (bitte
+vergessen Sie den Punkt am Ende nicht!). Auch hier sollten Sie das
+`dockerized-app` durch den Namen Ihrer App ersetzen, denn unter diesem Namen
+legt Docker das Image auf Ihrem Rechner ab.
 
 Ich bin ein großer Fan davon, all die Schritte zu automatisieren, die ich
 ständig wiederholen muss. Deshalb habe ich diese Schritte in einem

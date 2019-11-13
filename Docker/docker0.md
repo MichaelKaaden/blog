@@ -1,5 +1,7 @@
 # Angular-Apps und Docker: Einleitung
 
+> Einleitung: Warum Angular und Docker bestens zusammenpassen.
+
 Es ist soweit: Ihre Dank der zweiten Auflage des famosen
 [Angular-Buchs](https://angular-buch.com/) mit [Angular](https://angular.io/)
 erstellte App ist fertig. Die Unit- wie End-to-End-Tests leuchten tiefgrün. Die
@@ -136,6 +138,5 @@ Die Artikelserie besteht aus den folgenden Teilen:
 3. Multi-Stage Builds oder: Immer die Build-Umgebung dabei haben
 
 Für den Rest der Artikelserie gehe ich davon aus, dass Docker auf Ihrem System
-einwandfrei funktioniert. Wie Sie das prüfen können, zeigt der o. g. [_Getting
-Started Guide_](https://docs.docker.com/get-started/#test-docker-installation).
-
+einwandfrei funktioniert. Wie Sie das prüfen können, zeigt der o. g.
+[_Getting Started Guide_](https://docs.docker.com/get-started/#test-docker-installation).

@@ -1,5 +1,8 @@
 # Build Once, Run Anywhere oder: Konfiguration über Docker verwalten
 
+> Build Once, Run Anywhere: Wie man die Angular-App zur Laufzeit an beliebige
+> Umgebungen anpasst.
+
 Sie finden den Code zum Artikel auf
 [GitHub](https://github.com/MichaelKaaden/dockerized-app/tree/master/Part-2-Build-Once-Run-Anywhere).
 
@@ -115,8 +118,8 @@ export class SettingsService {
 ```
 
 Sehen wir uns den `SettingsInitializerService` an, der für das Laden der
-`src/assets/settings.json` verantwortlich ist. Sie erzeugen ihn mittels `ng g
-service services/settings-initializer`:
+`src/assets/settings.json` verantwortlich ist. Sie erzeugen ihn mittels
+`ng g service services/settings-initializer`:
 
 ```typescript
 import { HttpClient } from "@angular/common/http";
@@ -145,8 +148,12 @@ export class SettingsInitializerService {
 ```
 
 Der zugehörige Unit-Test sieht folgendermaßen aus:
+
 ```typescript
-import { HttpClientTestingModule, HttpTestingController } from "@angular/common/http/testing";
+import {
+    HttpClientTestingModule,
+    HttpTestingController,
+} from "@angular/common/http/testing";
 import { TestBed } from "@angular/core/testing";
 import { Settings } from "../models/settings";
 
@@ -204,7 +211,10 @@ describe("SettingsInitializerService", () => {
 
         const request = httpMock.expectOne("assets/settings.json");
         expect(request.request.method).toBe("GET");
-        request.flush(testSettings, { status: 500, statusText: "Some Weird Server Error" });
+        request.flush(testSettings, {
+            status: 500,
+            statusText: "Some Weird Server Error",
+        });
     });
 });
 ```
@@ -212,15 +222,14 @@ describe("SettingsInitializerService", () => {
 Das war noch nicht weiter kompliziert. Spannend wird es, wenn wir die
 Konfiguration aus dem `settings.json` laden wollen. Die App braucht die
 Konfiguration, sobald der Browser sie startet. Dummerweise lädt die App die
-Konfiguration aus dem `assets`-Verzeichnis per HTTP(S)-Aufruf, somit
-also asynchron. Wir brauchen also ein Mittel, um das Laden abzuwarten, bevor die
-App startet. Glücklicherweise hat Angular dafür das Konzept des
-`APP_INITIALIZER` eingeführt, das genau das leistet.
+Konfiguration aus dem `assets`-Verzeichnis per HTTP(S)-Aufruf, somit also
+asynchron. Wir brauchen also ein Mittel, um das Laden abzuwarten, bevor die App
+startet. Glücklicherweise hat Angular dafür das Konzept des `APP_INITIALIZER`
+eingeführt, das genau das leistet.
 
 Passen wir also das `app.module.ts` mit dieser Erkenntnis folgendermaßen an, um
 die Konfiguration zu laden. Tipp: Neu darin sind die Funktion `initSettings()`
 vor dem `@NgModule`-Decorator und der Provider.
-
 
 ```typescript
 import { HttpClientModule } from "@angular/common/http";
@@ -314,11 +323,12 @@ services:
             'daemon off;'"
 ```
 
-_Sie müssen die `command`-Angabe in *eine* einzige Zeile packen. Im obigen Beispiel habe ich die
-Backslashes lediglich dazu benutzt, die Zeile der Lesbarkeit wegen umzubrechen._
+_Sie müssen die `command`-Angabe in *eine* einzige Zeile packen. Im obigen
+Beispiel habe ich die Backslashes lediglich dazu benutzt, die Zeile der
+Lesbarkeit wegen umzubrechen._
 
-Mit dieser Änderung lädt `docker-compose` die Umgebung aus einer `docker.env`-Datei,
-die Sie bitte mit folgendem Inhalt anlegen:
+Mit dieser Änderung lädt `docker-compose` die Umgebung aus einer
+`docker.env`-Datei, die Sie bitte mit folgendem Inhalt anlegen:
 
 ```bash
 BASE_URL=http://some.official.server:444
