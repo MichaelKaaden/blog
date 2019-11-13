@@ -18,8 +18,8 @@ Projektlaufzeit hinweg unter Ihrer Kontrolle zu halten.
 ## Interne und externe Abhängigkeiten
 
 Kennen Sie das? Sie entwickeln ein Projekt nach allen Regeln der Ingenieurskunst
-durch, übergeben es dem Betrieb oder dem Kunden -- und dann fassen Sie es
-solange nicht mehr an, bis sich jemand bei Ihnen meldet und nach Änderungen
+durch, übergeben es dem Betrieb oder dem Kunden -- und dann fassen Sie es so
+lange nicht mehr an, bis sich jemand bei Ihnen meldet und nach Änderungen
 verlangt.
 
 Das ist dann der Moment, an dem Sie den Staub vom Projekt pusten und sich
@@ -36,7 +36,7 @@ noch Version 6? Und schon laden Sie beide Versionen herunter und probieren
 herum. Schnell ist dann die erste Stunde investiert, ohne dass Sie produktiv
 gewesen wären. Dabei ist Zeit doch Geld...
 
-Was ist schief gelaufen? Sie haben nicht beachtet, dass Sie es in Ihrem Projekt
+Was ist schiefgelaufen? Sie haben nicht beachtet, dass Sie es in Ihrem Projekt
 nicht nur mit _internen_ Abhängigkeiten zu tun haben, die Sie fein säuberlich in
 der `package.json`-Datei aufführen, sondern auch mit _externen_ Abhängigkeiten,
 etwa der eingesetzten Node.js-Version.
