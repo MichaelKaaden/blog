@@ -158,11 +158,12 @@ COPY --from=node /usr/src/app/dist/dockerized-app /usr/share/nginx/html
 ```
 
 Eine kurze Erklärung dazu: Dieses Dockerfile basiert auf einem Image mit Node.js
-10 und legt darin `@angular/cli` und den Chrome-Browser ab. Anschließend baut es
-die App, genau so, wie wir es bisher von Hand getan haben -- na, nicht ganz, wir
-lassen nun die Tests laufen, denn das gehört doch sicher auch bei Ihnen dazu,
-nicht wahr? Ansonsten kommentieren Sie die "RUN ng test ..."-Zeile einfach aus.
-Im zweiten Schritt (gekennzeichnet durch den Kommentar "Stage 2") kopiert es die
+10 und legt darin `@angular/cli` in Version 7.3.5 (passend zur Version in der
+`package.json`-Datei) und den Chrome-Browser ab. Anschließend baut es die App,
+genau so, wie wir es bisher von Hand getan haben -- na, nicht ganz, wir lassen
+nun die Tests laufen, denn das gehört doch sicher auch bei Ihnen dazu, nicht
+wahr? Ansonsten kommentieren Sie die "RUN ng test ..."-Zeile einfach aus. Im
+zweiten Schritt (gekennzeichnet durch den Kommentar "Stage 2") kopiert es die
 fertiggestellte App aus dem ersten Image in das zweite.
 
 Die entscheidenden Stellen sind `FROM node:10-buster as node`, die die
@@ -329,3 +330,35 @@ auf dem Zielsystem zum Laufen bringt.
 Somit können Sie sich in Zukunft auf Ihre Kernkompetenzen beschränken und das
 tun, was Ihnen Spaß macht. Um den Build und das Deployment kümmern sich Ihre
 Automatismen.
+
+## Grenzen der vorgestellten Lösung
+
+Mit der vorgestellten Lösung können wir unsere App jederzeit mit den von uns
+festgelegten NPM-Paketen bauen, zumindest unter der Annahme, dass diese Pakete
+auch in Zukunft noch verfügbar sind. Die NPM Registry vergisst nichts, insofern
+bin ich da äußerst zuversichtlich.
+
+Mittelfristig verändern sich die Images natürlich, die die Basis der Lösung
+darstellen. Node 10 wird in neueren Versionen vorliegen, das Debian 10-Image
+wird auch mit Updates versorgt. Unsere App wird davon weitgehend unbeeinflusst
+bleiben, einige NPM-Pakete wie `node-gyp` beispielsweise benötigen sowohl den
+installierten Python-Interpreter wie C++-Compiler. Das kann zu subtilen
+Änderungen führen.
+
+Betrachten wir einen Zeitraum von zehn Jahren, sieht die Situation deutlich
+düsterer aus, weil es dann evtl. kein Node 10-Image mehr gibt. Aus diesem Grund
+kann die vorgestellte Lösung keine Art von Langzeit-Archivierung der
+Build-Umgebung bieten. Falls dennoch genau das für Ihren Auftraggeber wichtig
+sein sollte, dann hat er das Problem typischerweise schon selbst für seine
+eigene Software im Griff, so dass Sie auf dessen Problemlösung zur Archivierung
+der Build-Umgebung zurückgreifen können (und sollten). Falls Sie das selbst mit
+Docker-Mitteln umsetzen wollen, müssen Sie wohl oder übel ein Basis-Image sicher
+aufbewahren, das dem Stand bis einschließlich dem `yarn install` entspricht. Ihr
+`Dockerfile` müssen Sie dann so verändern, dass es auf Basis dieses Image die
+App testet und baut und im letzten Schritt den nginx bestückt. Schön ist das
+allerdings nicht, denn die Idee hinter Docker ist, Images jederzeit frisch zu
+erzeugen, statt angegammelte Exemplare aus irgendeinem Backup zu kratzen. Aber
+wenn es gar nicht anders geht...
+
+Sie sehen, mittelfristig brauchen Sie sich keine ernsthaften Gedanken um Ihre
+Build-Umgebung zu machen. Langfristig sieht das anders aus.
