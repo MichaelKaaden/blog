@@ -230,10 +230,10 @@ Removing intermediate container a35c44a28667
  ---> 5959d3240af1
 Step 7/11 : RUN ng test --watch=false --browsers=ChromeHeadlessNoSandbox && ng build --prod
  ---> Running in e8e73909da63
-11 11 2019 17:51:51.637:INFO [karma-server]: Karma v4.0.1 server started at http://0.0.0.0:9876/
-11 11 2019 17:51:51.638:INFO [launcher]: Launching browsers ChromeHeadlessNoSandbox with concurrency unlimited
-11 11 2019 17:51:51.640:INFO [launcher]: Starting browser ChromeHeadless
-11 11 2019 17:51:53.962:INFO [HeadlessChrome 78.0.3904 (Linux 0.0.0)]: Connected on socket x67ZoJs6ERhBn45OAAAA with id 98052412
+11 11 2019 17:51:51.637:INFO [karma-server]: Karma v4.0.1 server started at http://0.0.0.0:9876/
+11 11 2019 17:51:51.638:INFO [launcher]: Launching browsers ChromeHeadlessNoSandbox with concurrency unlimited
+11 11 2019 17:51:51.640:INFO [launcher]: Starting browser ChromeHeadless
+11 11 2019 17:51:53.962:INFO [HeadlessChrome 78.0.3904 (Linux 0.0.0)]: Connected on socket x67ZoJs6ERhBn45OAAAA with id 98052412
 TOTAL: 9 SUCCESS
 TOTAL: 9 SUCCESS
 
@@ -309,6 +309,48 @@ gemessen:
 1GB ist eine stolze Größe. Würden wir unsere App mit diesem Image betreiben,
 hätten wir den zehnfachen Speicherbedarf...
 
+## Grenzen der vorgestellten Lösung
+
+Mit der vorgestellten Lösung können wir unsere App jederzeit mit den von uns
+festgelegten NPM-Paketen bauen, zumindest unter der Annahme, dass diese Pakete
+auch in Zukunft noch verfügbar sind. Die NPM Registry vergisst nichts, insofern
+bin ich da äußerst zuversichtlich.
+
+Mittelfristig verändern sich die Images natürlich, die die Basis der Lösung
+darstellen. Node 10 wird in neueren Versionen vorliegen, das Debian 10-Image
+wird ebenfalls mit Updates versorgt. Unsere App wird davon weitgehend
+unbeeinflusst bleiben. Allerdings benötigen einige NPM-Pakete wie `node-gyp`
+beispielsweise sowohl den installierten Python-Interpreter wie C++-Compiler. Das
+kann im Einzelfall zu der einen oder anderen Änderungen in der erzeugten App
+führen, was meist nicht auffallen wird, weil Sie sowieso das eine oder andere
+Sicherheitsupdate für von Ihnen verwendete NPM-Pakete einpflegen müssen. Die
+dadurch folgenden Veränderungen Ihrer App dürften Sie im Zweifelsfall viel mehr
+beschäftigen.
+
+Betrachten wir einen Zeitraum von zehn Jahren, sieht die Situation schon weniger
+rosig aus, weil es dann evtl. gar kein Node 10-Image mehr gibt. Dann müssten Sie
+sich aus dem zugehörigen Dckerfile selber eines bauen und dazu ggf.  auch die
+Node 10-Sourcen aufbewahren -- und die eine oder andere weitere Abhängigkeit wie
+ein Debian 10. Alternativ könnten Sie beispielsweise ein Basis-Image sicher
+aufbewahren, das dem Stand bis einschließlich dem `yarn install` entspricht. Ihr
+`Dockerfile` müssten Sie dann so verändern, dass es auf Basis dieses Image die
+App testet und baut und im letzten Schritt den nginx bestückt. Schön ist das
+allerdings nicht, denn die Idee hinter Docker ist, Images jederzeit frisch zu
+erzeugen, statt angegammelte Exemplare aus irgendeinem Backup zu kratzen.
+Möglich ist es dennoch.
+
+Damit sollte klar sein, dass die vorgestellte Lösung keine Art von
+Langzeit-Archivierung der Build-Umgebung bieten kann, weil kein Langzeit-Archiv
+der Abhängigkeiten wie der Basis-Images existiert. Falls dennoch genau das für
+Ihren Auftraggeber wichtig sein sollte, dann hat er das Problem typischerweise
+schon selbst für seine eigene Software im Griff, so dass Sie auf dessen
+Problemlösung zur Archivierung der Build-Umgebung zurückgreifen können (und
+sollten).
+
+Sie sehen, zumindest kurz- und mittelfristig brauchen Sie sich keine ernsthaften
+Gedanken um Ihre Build-Umgebung zu machen. Langfristig sieht das allerdings
+anders aus.
+
 ## Fazit
 
 Welche Methode sollten Sie also für Ihren Anwendungsfall wählen? Die
@@ -331,37 +373,6 @@ Version Ihres Projekts auscheckt, den Multi-Stage Build auslöst und das Ergebni
 auf dem Zielsystem zum Laufen bringt.
 
 Somit können Sie sich in Zukunft auf Ihre Kernkompetenzen beschränken und das
-tun, was Ihnen Spaß macht. Um den Build und das Deployment kümmern sich Ihre
-Automatismen.
+tun, was Ihnen Spaß macht: Tolle Software bauen. Um den Build und das Deployment
+kümmern sich Ihre Automatismen.
 
-## Grenzen der vorgestellten Lösung
-
-Mit der vorgestellten Lösung können wir unsere App jederzeit mit den von uns
-festgelegten NPM-Paketen bauen, zumindest unter der Annahme, dass diese Pakete
-auch in Zukunft noch verfügbar sind. Die NPM Registry vergisst nichts, insofern
-bin ich da äußerst zuversichtlich.
-
-Mittelfristig verändern sich die Images natürlich, die die Basis der Lösung
-darstellen. Node 10 wird in neueren Versionen vorliegen, das Debian 10-Image
-wird auch mit Updates versorgt. Unsere App wird davon weitgehend unbeeinflusst
-bleiben, einige NPM-Pakete wie `node-gyp` beispielsweise benötigen sowohl den
-installierten Python-Interpreter wie C++-Compiler. Das kann zu subtilen
-Änderungen führen.
-
-Betrachten wir einen Zeitraum von zehn Jahren, sieht die Situation deutlich
-düsterer aus, weil es dann evtl. kein Node 10-Image mehr gibt. Aus diesem Grund
-kann die vorgestellte Lösung keine Art von Langzeit-Archivierung der
-Build-Umgebung bieten. Falls dennoch genau das für Ihren Auftraggeber wichtig
-sein sollte, dann hat er das Problem typischerweise schon selbst für seine
-eigene Software im Griff, so dass Sie auf dessen Problemlösung zur Archivierung
-der Build-Umgebung zurückgreifen können (und sollten). Falls Sie das selbst mit
-Docker-Mitteln umsetzen wollen, müssen Sie wohl oder übel ein Basis-Image sicher
-aufbewahren, das dem Stand bis einschließlich dem `yarn install` entspricht. Ihr
-`Dockerfile` müssen Sie dann so verändern, dass es auf Basis dieses Image die
-App testet und baut und im letzten Schritt den nginx bestückt. Schön ist das
-allerdings nicht, denn die Idee hinter Docker ist, Images jederzeit frisch zu
-erzeugen, statt angegammelte Exemplare aus irgendeinem Backup zu kratzen. Aber
-wenn es gar nicht anders geht...
-
-Sie sehen, mittelfristig brauchen Sie sich keine ernsthaften Gedanken um Ihre
-Build-Umgebung zu machen. Langfristig sieht das anders aus.
