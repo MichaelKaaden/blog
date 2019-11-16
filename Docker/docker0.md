@@ -1,6 +1,8 @@
 # Angular-Apps und Docker: Einleitung
 
-> Einleitung: Warum Angular und Docker bestens zusammenpassen.
+> Warum Sie Docker nutzen sollten, um neue Versionen Ihrer App jederzeit
+> problemlos bauen, deployen und auch in mehreren Versionen parallel zueinander
+> betreiben zu können.
 
 Es ist soweit: Ihre Dank der zweiten Auflage des famosen
 [Angular-Buchs](https://angular-buch.com/) mit [Angular](https://angular.io/)

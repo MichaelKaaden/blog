@@ -1,7 +1,8 @@
 # Multi-Stage Builds oder: Immer die Build-Umgebung dabei haben
 
-> Multi-Stage Builds für Angular: Wie man Apps im Container baut und schlanke
-> Docker-Images erstellt. Vermeiden Sie Risiken durch externe Abhängigkeiten!
+> Multi-Stage Builds für Angular: Wie Sie Apps gleich im Container bauen und
+> trotzdem schlanke Docker-Images erstellen. Vermeiden Sie Risiken durch externe
+> Abhängigkeiten!
 
 Sie finden den Code zum Artikel auf
 [GitHub](https://github.com/MichaelKaaden/dockerized-app/tree/master/Part-3-Multi-Stage-Build).

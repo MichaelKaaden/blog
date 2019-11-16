@@ -1,7 +1,7 @@
 # Build Once, Run Anywhere oder: Konfiguration über Docker verwalten
 
-> Build Once, Run Anywhere: Wie man die Angular-App zur Laufzeit an beliebige
-> Umgebungen anpasst.
+> Build Once, Run Anywhere: Wie Sie ein einziges Image zur Laufzeit an beliebige
+> Umgebungen anpassen. Bleiben Sie auch ohne Code-Änderung flexibel!
 
 Sie finden den Code zum Artikel auf
 [GitHub](https://github.com/MichaelKaaden/dockerized-app/tree/master/Part-2-Build-Once-Run-Anywhere).

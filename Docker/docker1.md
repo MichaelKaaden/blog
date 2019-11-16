@@ -1,7 +1,8 @@
 # Angular-App über Docker bereitstellen
 
-> First Steps: Wie man Angular-App in ein Docker-Image packt und in einem
-> Container bequem zur Ausführung bringt.
+> First Steps: Wie Sie Ihre Angular-App in ein Docker-Image packen und als
+> Container zur Ausführung bringen. Vergessen Sie Ihre Sorgen über den korrekten
+> Build und das perfekte Deployment!
 
 Sie finden den Code zum Artikel auf
 [GitHub](https://github.com/MichaelKaaden/dockerized-app/tree/master/Part-1-Simple-Case).
