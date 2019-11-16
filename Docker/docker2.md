@@ -147,6 +147,11 @@ export class SettingsInitializerService {
 }
 ```
 
+Von Angular sind Sie es gewohnt, mit Observables zu arbeiten. Daher wundern Sie
+sich eventuell über den Rückgabetyp von `initializeSettings()`. Des Rätsels
+Lösung ist ganz einfach: Der Mechanismus, über den wir in Kürze alles
+miteinander verdrahten, erwartet an der Stelle ein Promise.
+
 Der zugehörige Unit-Test sieht folgendermaßen aus:
 
 ```typescript
