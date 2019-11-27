@@ -101,17 +101,23 @@ nicht hunderte von Containern auf einem handelsüblichen Rechner betreiben.
 ![Docker-Virtualisierung](https://docs.docker.com/images/VM%402x.png) Quelle:
 [https://docs.docker.com/get-started/](https://docs.docker.com/get-started/)
 
-### Repositories
+### Docker Registrys
 
-Docker-Images können über _Repositories_ verteilt werden. Das können öffentliche
-wie der [Docker Hub](https://hub.docker.com/) oder auch private in Ihrem lokalen
-Netz sein. Die Installation ist extrem einfach, denn auch das Repository kommt
-als Docker-Image auf Ihren Rechner. Sie können Images über ein Repository in
-Ihrem Netzwerk verteilen: Rechner A, sei es Ihr Entwicklerrechner oder ein Build
-Server, baut ein Docker-Image und schiebt dieses in das Repository. Rechner B,
-Ihr Web-Server, holt sich das jeweils neueste Image vom Repository und startet
-damit den Container neu. Schon haben Sie eine neue Version Ihrer App zum Laufen
-gebracht.
+Docker-Images können über sog. _Docker Registrys_ verteilt werden. Das können
+öffentliche wie der [Docker Hub](https://hub.docker.com/) oder auch private in
+Ihrem lokalen Netz sein. Die Installation ist extrem einfach, denn auch die
+Registry kommt als Docker-Image auf Ihren Rechner.
+
+Sie können Images über eine Registry in Ihrem Netzwerk verteilen: Rechner A, sei
+es Ihr Entwicklerrechner oder ein Build Server, baut ein Docker-Image und
+schiebt dieses in die Registry. Rechner B, Ihr Web-Server, holt sich das jeweils
+neueste Image von der Registry und startet damit den Container neu. Schon haben
+Sie eine neue Version Ihrer App zum Laufen gebracht.
+
+Wenn Sie mehr zu dem Thema erfahren wollen, so empfehle ich Ihnen einen Blick in
+die offizielle Dokumentation zur
+[Docker Registry](https://docs.docker.com/registry/) zu werfen. Diese ermöglicht
+es Ihnen, Ihre selbstgebauten Images zu hosten.
 
 ### Lösungsskizze
 
